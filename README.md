@@ -35,7 +35,6 @@ This project aims to develop an interactive data visualization dashboard that pr
 2. **Hover & Click Features**: Detailed data appears when users hover over visual elements.
 3. **Time-Series Animation**: Users can track wealth accumulation over time.
 
-This dashboard will be built with a realistic scope, ensuring usability while maintaining a high standard of design and interactivity.
 ![Billionaire Data Analysis Sketch](sketch.jpg)
 
 ## Expected Outcomes
