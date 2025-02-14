@@ -1,7 +1,7 @@
-# Billionaire Data Analysis Project
+# Billionaires Data Visualization Dashboard
 
 ## Overview
-The **Billionaire Data Analysis Project** aims to conduct an **Exploratory Data Analysis (EDA)** to understand the global distribution of billionaires. The analysis will focus on identifying geographic patterns and economic factors associated with wealth concentration.
+This project aims to develop an interactive data visualization dashboard that provides insights into self-made billionaires. The dashboard will enable users to explore billionaire distribution across different countries, industry trends, and the influence of age and education on wealth accumulation.
 
 ## Project Goals
 1. **Global Distribution Analysis**:
@@ -29,6 +29,13 @@ The **Billionaire Data Analysis Project** aims to conduct an **Exploratory Data 
 3. **Comparative Analysis**:
    - Compare the industrial landscape of billionaire cities with their key economic sectors.
    - Assess correlations between billionaire industries and city policies.
+     
+## Interaction Design
+1. **Dropdown Filters**: Users can filter billionaires by country, industry, and year.
+2. **Hover & Click Features**: Detailed data appears when users hover over visual elements.
+3. **Time-Series Animation**: Users can track wealth accumulation over time.
+
+This dashboard will be built with a realistic scope, ensuring usability while maintaining a high standard of design and interactivity.
 ![Billionaire Data Analysis Sketch](sketch.jpg)
 
 ## Expected Outcomes
