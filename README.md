@@ -1,4 +1,4 @@
-#Billionaire Data Analysis Project
+# Billionaire Data Analysis Project
 
 ## Overview
 The **Billionaire Data Analysis Project** aims to conduct an **Exploratory Data Analysis (EDA)** to understand the global distribution of billionaires. The analysis will focus on identifying geographic patterns and economic factors associated with wealth concentration.
