@@ -36,19 +36,15 @@ def register_callbacks(app):
         
         elif tab == 'tab2':
             return dbc.Container([
-                html.H3("Wealth Distribution by Industry222", 
+                html.H3("Wealth Distribution by Industry", 
                         style={'textAlign': 'center', 'fontWeight': 'bold'}),
 
-                # 📌 强制左侧和右侧对齐，不重叠
+                # 📌 使用 `align-items: stretch` 确保左右两列对齐
                 dbc.Row([
-                    # 📌 Treemap 确保不会被挤压
                     dbc.Col(dcc.Graph(id="industry-treemap", figure=create_treemap(),
-                                    style={'height': '600px', 'width': '100%', 'minHeight': '500px'}),
-                            width=8, style={'display': 'flex', 'alignItems': 'stretch'}),
-
-                    # 📌 右侧内容 - 让 Total Wealth, Top5 Cities, Top5 People 不会重叠
+                                    style={'width': '100%', 'height': '100%'}), width=8, style={'display': 'flex'}),
+                    
                     dbc.Col([
-                        # 💰 Total Wealth Box (不会浮动)
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4("Total Wealth", className="card-title", 
@@ -58,20 +54,15 @@ def register_callbacks(app):
                                     style={'fontSize': '22px', 'textAlign': 'center', 'color': '#2C3E50'})
                             ]),
                             className="border-primary shadow-lg",
-                            style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'marginBottom': '10px'}
+                            style={'padding': '10px', 'backgroundColor': '#f8f9fa'}
                         ),
 
-                        # 📊 Top 5 城市 (确保不会浮到上方)
-                        dcc.Graph(id="top5-cities-bar",
-                                style={'height': '45%', 'width': '100%', 'marginBottom': '10px'}),
-
-                        # 👤 Top 5 富豪
-                        dcc.Graph(id="top5-people-bar",
-                                style={'height': '45%', 'width': '100%'})
-                    ], width=4, 
-                    style={'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'space-between'})
-                ], style={'height': '600px'})  # ✅ 强制左右等高
+                        dcc.Graph(id="top5-cities-bar", style={'width': '100%', 'height': '100%'}),
+                        dcc.Graph(id="top5-people-bar", style={'width': '100%', 'height': '100%'})
+                    ], width=4, style={'display': 'flex', 'flexDirection': 'column'})
+                ], align="stretch")  # ✅ 让左右两列自动对齐
             ], fluid=True)
+            
 
         
         elif tab == 'tab3':

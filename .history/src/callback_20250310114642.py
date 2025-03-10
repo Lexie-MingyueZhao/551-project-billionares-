@@ -4,6 +4,7 @@ import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
 from data import df, top_cities 
+import dash_draggable
 from plots import create_map, create_radar_chart,create_treemap, create_top5_cities_bar, create_top5_people_bar, create_age_distribution, create_gender_pie, create_wealth_source_pie
 def register_callbacks(app):
     @app.callback(
@@ -46,31 +47,40 @@ def register_callbacks(app):
                                     style={'height': '600px', 'width': '100%', 'minHeight': '500px'}),
                             width=8, style={'display': 'flex', 'alignItems': 'stretch'}),
 
-                    # 📌 右侧内容 - 让 Total Wealth, Top5 Cities, Top5 People 不会重叠
-                    dbc.Col([
-                        # 💰 Total Wealth Box (不会浮动)
-                        dbc.Card(
-                            dbc.CardBody([
-                                html.H4("Total Wealth", className="card-title", 
-                                        style={'textAlign': 'center', 'fontWeight': 'bold'}),
-                                html.P(id="industry-wealth-box",
-                                    className="card-text",
-                                    style={'fontSize': '22px', 'textAlign': 'center', 'color': '#2C3E50'})
-                            ]),
-                            className="border-primary shadow-lg",
-                            style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'marginBottom': '10px'}
+                                # 📌 右侧浮动组件，支持鼠标拖拽
+                    dbc.Col(
+                        dash_draggable.ResponsiveGridLayout(
+                            id="draggable-layout",
+                            children=[
+                                dash_draggable.Draggable(
+                                    id="total-wealth-box",
+                                    children=dbc.Card(
+                                        dbc.CardBody([
+                                            html.H4("Total Wealth", className="card-title", style={'textAlign': 'center'}),
+                                            html.P(id="industry-wealth-box",
+                                                className="card-text",
+                                                style={'fontSize': '22px', 'textAlign': 'center', 'color': '#2C3E50'})
+                                        ]),
+                                        className="border-primary shadow-lg",
+                                        style={'padding': '10px', 'backgroundColor': '#f8f9fa'}
+                                    ),
+                                    defaultPosition={'x': 0, 'y': 0},  # 📌 默认位置
+                                ),
+                                dash_draggable.Draggable(
+                                    id="top5-cities",
+                                    children=dcc.Graph(id="top5-cities-bar", style={'height': '350px'}),
+                                    defaultPosition={'x': 0, 'y': 100},
+                                ),
+                                dash_draggable.Draggable(
+                                    id="top5-people",
+                                    children=dcc.Graph(id="top5-people-bar", style={'height': '350px'}),
+                                    defaultPosition={'x': 0, 'y': 200},
+                                )
+                            ]
                         ),
-
-                        # 📊 Top 5 城市 (确保不会浮到上方)
-                        dcc.Graph(id="top5-cities-bar",
-                                style={'height': '45%', 'width': '100%', 'marginBottom': '10px'}),
-
-                        # 👤 Top 5 富豪
-                        dcc.Graph(id="top5-people-bar",
-                                style={'height': '45%', 'width': '100%'})
-                    ], width=4, 
-                    style={'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'space-between'})
-                ], style={'height': '600px'})  # ✅ 强制左右等高
+                        width=4
+                    )
+                ])
             ], fluid=True)
 
         

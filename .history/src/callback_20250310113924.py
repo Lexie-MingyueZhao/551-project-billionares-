@@ -36,7 +36,7 @@ def register_callbacks(app):
         
         elif tab == 'tab2':
             return dbc.Container([
-                html.H3("Wealth Distribution by Industry222", 
+                html.H3("Wealth Distribution by Industry2", 
                         style={'textAlign': 'center', 'fontWeight': 'bold'}),
 
                 # 📌 强制左侧和右侧对齐，不重叠

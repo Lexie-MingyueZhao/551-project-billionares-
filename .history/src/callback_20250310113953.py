@@ -44,7 +44,7 @@ def register_callbacks(app):
                     # 📌 Treemap 确保不会被挤压
                     dbc.Col(dcc.Graph(id="industry-treemap", figure=create_treemap(),
                                     style={'height': '600px', 'width': '100%', 'minHeight': '500px'}),
-                            width=8, style={'display': 'flex', 'alignItems': 'stretch'}),
+                            width=3, style={'display': 'flex', 'alignItems': 'stretch'}),
 
                     # 📌 右侧内容 - 让 Total Wealth, Top5 Cities, Top5 People 不会重叠
                     dbc.Col([

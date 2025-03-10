@@ -36,19 +36,17 @@ def register_callbacks(app):
         
         elif tab == 'tab2':
             return dbc.Container([
-                html.H3("Wealth Distribution by Industry222", 
+                html.H3("Wealth Distribution by Industry", 
                         style={'textAlign': 'center', 'fontWeight': 'bold'}),
-
-                # 📌 强制左侧和右侧对齐，不重叠
+                
                 dbc.Row([
-                    # 📌 Treemap 确保不会被挤压
+                    # 📌 调整 Treemap 宽度，使右侧有足够空间
                     dbc.Col(dcc.Graph(id="industry-treemap", figure=create_treemap(),
-                                    style={'height': '600px', 'width': '100%', 'minHeight': '500px'}),
-                            width=8, style={'display': 'flex', 'alignItems': 'stretch'}),
+                                    style={'height': '500px'}), width=8),
 
-                    # 📌 右侧内容 - 让 Total Wealth, Top5 Cities, Top5 People 不会重叠
+                    # 📌 右侧 Wealth Box + 柱状图
                     dbc.Col([
-                        # 💰 Total Wealth Box (不会浮动)
+                        # 💎 使用 Card 美化 Final Wealth Box
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4("Total Wealth", className="card-title", 
@@ -57,21 +55,19 @@ def register_callbacks(app):
                                     className="card-text",
                                     style={'fontSize': '22px', 'textAlign': 'center', 'color': '#2C3E50'})
                             ]),
-                            className="border-primary shadow-lg",
-                            style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'marginBottom': '10px'}
+                            className="border-primary shadow-lg",  # ✅ 添加边框 & 阴影
+                            style={'padding': '10px', 'backgroundColor': '#f8f9fa'}  # ✅ 背景色
                         ),
 
-                        # 📊 Top 5 城市 (确保不会浮到上方)
-                        dcc.Graph(id="top5-cities-bar",
-                                style={'height': '45%', 'width': '100%', 'marginBottom': '10px'}),
+                        # 📊 Top 5 城市
+                        dcc.Graph(id="top5-cities-bar", style={'height': '350px'}),
 
                         # 👤 Top 5 富豪
-                        dcc.Graph(id="top5-people-bar",
-                                style={'height': '45%', 'width': '100%'})
-                    ], width=4, 
-                    style={'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'space-between'})
-                ], style={'height': '600px'})  # ✅ 强制左右等高
+                        dcc.Graph(id="top5-people-bar", style={'height': '350px'})
+                    ], width=4)  # 📌 右侧缩窄
+                ])
             ], fluid=True)
+            
 
         
         elif tab == 'tab3':
