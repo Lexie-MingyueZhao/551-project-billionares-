@@ -146,7 +146,7 @@ Here are some practical ways this dashboard can be used:
 
 ## Dashboard Output
 
-![Tab1](https://github.com/Lexie-MingyueZhao/551-project-billionares-/tab1.png?raw=true) ![Tab2](https://github.com/Lexie-MingyueZhao/551-project-billionares-/tab2.png?raw=true) ![Tab3](https://github.com/Lexie-MingyueZhao/551-project-billionares-/tab3.png?raw=true)
+![Tab1](tab1.png) ![Tab2](tab2.png) ![Tab3](tab3.png)
 
 ## Contributors
 
