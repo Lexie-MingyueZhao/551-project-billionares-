@@ -79,6 +79,39 @@ def create_radar_chart(country):
 
     return fig
 
+def create_ranking_bar_chart():
+    """
+    创建一个排名条形图，展示亿万富翁最多的前 10 个城市
+    """
+    # 假设 df 包含城市亿万富翁数量
+    top_cities = df.groupby('city')['billionaire_count'].count().reset_index()
+    top_cities = top_cities.sort_values('billionaire_count', ascending=False).head(10)
+
+    fig = px.bar(
+        top_cities,
+        x="billionaire_count",
+        y="city",
+        orientation='h',
+        text="billionaire_count",
+        title="Top 10 Cities with Most Billionaires",
+        labels={"billionaire_count": "Number of Billionaires", "city": "City"},
+        color="billionaire_count",
+        color_continuous_scale="blues"
+    )
+
+    fig.update_traces(
+        texttemplate='%{text}',
+        textposition='inside'
+    )
+    fig.update_layout(
+        coloraxis_showscale=False,
+        yaxis=dict(categoryorder="total ascending"),
+        showlegend=False,
+        margin=dict(t=50, l=0, r=15, b=25)
+    )
+
+    return fig
+
 
 def create_treemap():
     """
@@ -88,10 +121,12 @@ def create_treemap():
     
     fig = px.treemap(df, path=['industries'], values='finalWorth',
                   title='Wealth Distribution by Industry',
-                  color_discrete_sequence=px.colors.qualitative.Set1)
+                  color_discrete_sequence=px.colors.qualitative.Set1,
+                   branchvalues="total" )
     fig.update_traces(textinfo="label+percent entry")
     fig.update_traces(
-        hovertemplate="<b>%{label}</b><br>Wealth: $%{value:,.2f} Billion"
+        hovertemplate="<b>%{label}</b><br>Wealth: $%{value:,.2f} Billion",
+        textfont=dict(size=20)
     )
     fig.update_layout(margin=dict(t=50, l=25, r=25, b=25),height=850,width=900,)
     
@@ -119,11 +154,12 @@ def create_top5_cities_bar(selected_industry):
         text="finalWorth",
         title=f"Top 5 Cities in {selected_industry}",
         labels={"finalWorth": "Total Wealth (Billion)", "city": "City"},
+        color_discrete_sequence=["#FFD700"]
     )
 
-    fig.update_traces(texttemplate='%{text:.2s}B', textposition='outside')
+    fig.update_traces(texttemplate='%{text:.2s}B', textposition='inside')
     fig.update_layout(yaxis={'categoryorder': 'total ascending'})
-    fig.update_layout(showlegend=False)
+    fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)" )
 
     return fig
 
@@ -148,13 +184,15 @@ def create_top5_people_bar(selected_industry):
         text="finalWorth",
         title=f"Top 5 Billionaires in {selected_industry}",
         labels={"finalWorth": "Total Wealth (Billion)", "personName": "Billionaire","country":"Country"},
+        color_discrete_sequence=["#FFD700"]
     )
 
-    fig.update_traces(texttemplate='%{text:.2s}B', textposition='outside')
+    fig.update_traces(texttemplate='%{text:.2s}B', textposition='inside')
     fig.update_layout(
         yaxis={'categoryorder': 'total ascending', 'tickmode': 'array', 'tickvals': top_people["personName"]},
         xaxis_title="Total Wealth (Billion)"
     )
+    fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)" )
 
     return fig
 

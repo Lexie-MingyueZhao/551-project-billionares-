@@ -4,7 +4,8 @@ import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
 from data import df, top_cities 
-from plots import create_map, create_radar_chart,create_treemap, create_top5_cities_bar, create_top5_people_bar, create_age_distribution, create_gender_pie, create_wealth_source_pie
+from plots import create_map, create_radar_chart,create_treemap, create_top5_cities_bar, create_top5_people_bar, create_age_distribution, create_gender_pie, create_wealth_source_pie,create_ranking_bar_chart
+
 def register_callbacks(app):
     @app.callback(
         Output('tabs-content', 'children'),
@@ -29,26 +30,35 @@ def register_callbacks(app):
                     labelStyle={'display': 'block'}
                 ),
                 dbc.Row([
-                    dbc.Col(dcc.Graph(id="world-map"), width=8),  # 🌍 左侧地图
-                    dbc.Col(html.Div(id="country-details"), width=4)  # 📊 右侧雷达图
+                    # 🌍 给地图加框 & 透明度调整
+                    dbc.Col(dbc.Card(
+                        dbc.CardBody([
+                            dcc.Graph(id="world-map")
+                        ]),
+                        style={'border': '2px solid rgba(44, 62, 80, 0.4)',  # 📌 透明度 0.4
+                            'borderRadius': '10px',  # ✅ 圆角
+                            'padding': '10px',
+                            'boxShadow': '2px 2px 10px rgba(0,0,0,0.1)'}  # ✅ 添加轻微阴影
+                    ), width=8),
+
+                    dbc.Col(html.Div(id="country-details"), width=4)  # 📊 右侧信息
                 ])
-            ])
+            ]),
+
         
         elif tab == 'tab2':
             return dbc.Container([
-                html.H3("Wealth Distribution by Industry222", 
+                html.H3("Wealth Distribution by Industry", 
                         style={'textAlign': 'center', 'fontWeight': 'bold'}),
-
-                # 📌 强制左侧和右侧对齐，不重叠
+                
                 dbc.Row([
-                    # 📌 Treemap 确保不会被挤压
+                    # 📌 调整 Treemap 宽度，使右侧有足够空间
                     dbc.Col(dcc.Graph(id="industry-treemap", figure=create_treemap(),
-                                    style={'height': '600px', 'width': '100%', 'minHeight': '500px'}),
-                            width=8, style={'display': 'flex', 'alignItems': 'stretch'}),
+                                    style={'height': '500px'}), width=8),
 
-                    # 📌 右侧内容 - 让 Total Wealth, Top5 Cities, Top5 People 不会重叠
+                    # 📌 右侧 Wealth Box + 柱状图
                     dbc.Col([
-                        # 💰 Total Wealth Box (不会浮动)
+                        # 💎 使用 Card 美化 Final Wealth Box
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4("Total Wealth", className="card-title", 
@@ -57,20 +67,26 @@ def register_callbacks(app):
                                     className="card-text",
                                     style={'fontSize': '22px', 'textAlign': 'center', 'color': '#2C3E50'})
                             ]),
-                            className="border-primary shadow-lg",
-                            style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'marginBottom': '10px'}
+                            className="shadow-lg",  # ✅ 添加边框 & 阴影
+                             style={
+                                    'border': '2px solid rgba(100, 100, 100, 0.4)',  # ✅ **改为浅灰色边框**
+                                    'padding': '15px', 
+                                    'borderRadius': '10px', 
+                                    'boxShadow': '2px 2px 10px #aaaaaa',
+                                    'marginBottom': '15px',
+                                    'marginLeft': '20px'  
+                                }
                         ),
 
-                        # 📊 Top 5 城市 (确保不会浮到上方)
-                        dcc.Graph(id="top5-cities-bar",
-                                style={'height': '45%', 'width': '100%', 'marginBottom': '10px'}),
+                        
+
+                        # 📊 Top 5 城市
+                        dcc.Graph(id="top5-cities-bar", style={'height': '350px'}),
 
                         # 👤 Top 5 富豪
-                        dcc.Graph(id="top5-people-bar",
-                                style={'height': '45%', 'width': '100%'})
-                    ], width=4, 
-                    style={'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'space-between'})
-                ], style={'height': '600px'})  # ✅ 强制左右等高
+                        dcc.Graph(id="top5-people-bar", style={'height': '350px'})
+                    ], width=4)  # 📌 右侧缩窄
+                ])
             ], fluid=True)
 
         
@@ -133,11 +149,11 @@ def register_callbacks(app):
             return html.Div(f"No data available for {country}")
 
         country_data = country_data.iloc[0]
-        # ✅ 格式化数值
+        #  格式化数值
         gdp_trillion = country_data['gdp_country'] / 1e12  # 转换为万亿美元
         population_billion = country_data['population_country'] / 1e9  # 转换为十亿
 
-        # ✅ 教育指数 & 税率增加描述
+        # 教育指数 & 税率增加描述
         edu_index = country_data['gross_tertiary_education_enrollment']
         tax_rate = country_data['total_tax_rate_country']
 
@@ -154,19 +170,48 @@ def register_callbacks(app):
             tax_desc = " (Medium)"
         else:
             tax_desc = " (Low)"
-        radar_fig = create_radar_chart(country)
+        
+        ranking_chart = create_ranking_bar_chart()
 
-        return dbc.Container([
-            html.H3(f"{country} Overview"),
-            html.P(f"GDP: ${gdp_trillion:.2f} Trillion"),
-            html.P(f"Population: {population_billion:.2f} Billion"),
-            html.P(f"Education Index: {edu_index:.2f}{edu_desc}"),
-            html.P(f"Tax Rate: {tax_rate:.2f}%{tax_desc}"),
+        overview_card = dbc.Card(
+            dbc.CardBody([
+                html.H3(f"{country} Overview", className="card-title", style={'textAlign': 'center', 'fontWeight': 'bold'}),
+                html.P(f"GDP: ${gdp_trillion:.2f} Trillion"),
+                html.P(f"Population: {population_billion:.2f} Billion"),
+                html.P(f"Education Index: {edu_index:.2f}{edu_desc}"),
+                html.P(f"Tax Rate: {tax_rate:.2f}%{tax_desc}"),
+            ]),
+            style={
+                'border': '2px solid rgba(44, 62, 80, 0.4)', 
+                'padding': '15px', 
+                'borderRadius': '10px', 
+                'boxShadow': '2px 2px 10px #aaaaaa',
+                'marginBottom': '15px'
+            }
+        )
+        bar_graph = dbc.Container([
+            dbc.Row([
+            dbc.Col(
+                dbc.Card(
+                    dbc.CardBody([
+                        dcc.Graph(id="ranking-chart", figure=create_ranking_bar_chart(), style={'height': '400px'})
+                    ]),
+                    style={'border': '2px solid rgba(44, 62, 80, 0.4)',  # **浅色边框**
+                           'borderRadius': '10px',
+                           'padding': '10px',
+                           'boxShadow': '2px 2px 10px rgba(0,0,0,0.1)',  # **轻微阴影**
+                           'marginBottom': '10px'}
+                ) 
+            )
+        ])
+    ])
 
-            dcc.Graph(figure=radar_fig)
+        return html.Div([
+            overview_card,  
+            bar_graph  
         ])
     @app.callback(
-    [Output("industry-wealth-box", "children"),  # 右上角 Wealth 框
+    [Output("industry-wealth-box", "children"),  
          Output("top5-cities-bar", "figure"),  # 中部 Top 5 城市
          Output("top5-people-bar", "figure")],  # 底部 Top 5 富豪
         Input("industry-treemap", "clickData")
@@ -189,10 +234,13 @@ def register_callbacks(app):
         industry_wealth_text = f"Total Wealth: ${industry_total_wealth:,.2f} Billion"
 
         # 📌 更新 详情框
-        industry_details_div = html.Div([
-            html.H4(f"{selected_industry} Overview", style={'fontWeight': 'bold'}),
-            html.P(f"Total Wealth: ${industry_total_wealth:,.2f} Billion", style={'fontSize': '18px'}),
-        ])
+        industry_details_div = dbc.Card(
+            dbc.CardBody([
+                html.H4(f"{selected_industry} Overview", style={'fontWeight': 'bold'}),
+                html.P(f"Total Wealth: ${industry_total_wealth:,.2f} Billion", style={'fontSize': '18px'}),
+            ]),
+            
+        )
 
         return industry_wealth_text, top_cities_fig, top_people_fig
     
