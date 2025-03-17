@@ -5,18 +5,18 @@ from styles import layout
 from callback import register_callbacks
 
 
-# 创建 Dash 应用
+# create Dash app
 app = dash.Dash(__name__, 
                 external_stylesheets=[dbc.themes.BOOTSTRAP], 
                 suppress_callback_exceptions=True)
 app.title = "Billionaire Insights Dashboard"
 
-# 设置布局
+# set layout
 app.layout = layout
 
-# 注册回调函数
+# register callback app
 register_callbacks(app)
 
-# 运行应用
+# run dash_app
 if __name__ == '__main__':
     app.run_server(debug=True, port=8051)

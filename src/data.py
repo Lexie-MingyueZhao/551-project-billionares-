@@ -20,13 +20,13 @@ df['population_country'] = df['population_country'].fillna(df['population_countr
 df['gross_tertiary_education_enrollment'] = df['gross_tertiary_education_enrollment'].fillna(df['gross_tertiary_education_enrollment'].median())
 df['total_tax_rate_country'] = df['total_tax_rate_country'].fillna(df['total_tax_rate_country'].median())
 
-# ✅ 计算每个国家的亿万富翁数量
+# calculate the number of billinaires in each country
 df['billionaire_count'] = df.groupby('country')['finalWorth'].transform('count')
 
-# ✅ 计算每个国家的亿万富翁总财富
+# calculate total wealth
 df['total_wealth'] = df.groupby('country')['finalWorth'].transform('sum')
 
-# ✅ 计算每个国家的亿万富翁密度（富豪数量 / 总人口）
+# Calculate the billionaire density (number of billionaires / total population) for each country
 df['billionaire_density'] = df['billionaire_count'] / df['population_country']
 df['billionaire_density'] = df['billionaire_density'].fillna(0)
 df_cleaned = df[['age', 'finalWorth']].dropna()

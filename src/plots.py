@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 def create_map(mode="count", selected_country=None):
-    """ ✅ 生成地图，点击国家后 Zoom In，Legend 位置调整到左侧 """
+    """ Generate the map, click on the country after Zoom In """
     if mode == 'count':
         color_col, title, colorbar_title, color_scale = 'billionaire_count', 'Billionaire Count by Country', "Billionaire Count", "Blues"
     elif mode == 'wealth':
@@ -18,6 +18,9 @@ def create_map(mode="count", selected_country=None):
 
     df_grouped = df.groupby('country', as_index=False).agg(value=(color_col, 'sum'))
 
+    color_min = df_grouped["value"].quantile(0.05) 
+    color_max = df_grouped["value"].quantile(0.95)
+
     fig = px.choropleth(
         df_grouped,
         locations="country",
@@ -25,21 +28,29 @@ def create_map(mode="count", selected_country=None):
         color="value",
         hover_name="country",
         color_continuous_scale=color_scale,
-        title=title
+        color_continuous_midpoint=df_grouped["value"].median(),
+        range_color=[color_min, color_max]
     )
 
-    # ✅ 调整 Legend 位置（放在左侧）
+    fig.update_geos(
+        showcoastlines=True,
+        showland=True,
+        landcolor="white",
+        projection_type="natural earth"
+     )
+
+    # Legend position adjusts to the left
     fig.update_layout(
         height=700,
-        geo=dict(showcoastlines=True, projection_type="natural earth"),
+        margin=dict(l=0, r=0, t=0, b=0),
         coloraxis_colorbar=dict(
-            title=colorbar_title,
+            title="",
             ticks="outside",
-            x=-0.15  # ✅ 调整到左侧
+            x=-0.15  
         )
     )
 
-    # ✅ 如果点击了国家，放大该地区
+    # click on the country after Zoom In
     if selected_country:
         country_data = df[df['country'] == selected_country]
         if not country_data.empty:
@@ -50,7 +61,7 @@ def create_map(mode="count", selected_country=None):
 
 
 def create_radar_chart(country):
-    """ ✅ 蓝色主题雷达图 """
+    """ radar chart """
     country_data = df[df['country'] == country].iloc[0]
 
     categories = ["Population (100M)", "Education Enrollment", "Tax Rate", "GDP (Trillion USD)"]
@@ -81,9 +92,8 @@ def create_radar_chart(country):
 
 def create_ranking_bar_chart():
     """
-    创建一个排名条形图，展示亿万富翁最多的前 10 个城市
+    Create a ranking bar chart that showcases the top 10 cities with the most billionaires
     """
-    # 假设 df 包含城市亿万富翁数量
     top_cities = df.groupby('city')['billionaire_count'].count().reset_index()
     top_cities = top_cities.sort_values('billionaire_count', ascending=False).head(10)
 
@@ -115,7 +125,7 @@ def create_ranking_bar_chart():
 
 def create_treemap():
     """
-    创建一个 Treemap 展示不同行业的财富占比
+    Create a Treemap to show the percentage of wealth in different industries
     """
     industry_group = df.groupby('industries', as_index=False)['finalWorth'].sum()
     
@@ -166,7 +176,7 @@ def create_top5_cities_bar(selected_industry):
 
 def create_top5_people_bar(selected_industry):
     """
-    生成 Top 5 富豪（按该行业财富排序）的柱状图
+    Generate a bar chart of the top 5 cities, sorted by wealth in that sector
     """
     industry_df = df[df['industries'] == selected_industry]
 
@@ -206,21 +216,20 @@ def create_age_distribution():
                        nbins=20, 
                        title="Billionaire Age Distribution",
                        labels={"age": "Age", "count": "Number of Billionaires"},
-                       color_discrete_sequence=["#3498db"],  # 更柔和的蓝色
-                       opacity=0.8,  # 透明度增强层次感
-                       text_auto=False  # 直方图上显示具体数值
+                       color_discrete_sequence=["#3498db"],  
+                       opacity=0.8,  
+                       text_auto=False  
                       )
 
-    # 添加优化细节
-    fig.update_traces(marker_line_color='black',  # 给柱子加黑色边框，增强对比度
+   
+    fig.update_traces(marker_line_color='black',  
                       marker_line_width=1,  
-                      hoverinfo="x+y",  # 鼠标悬停时显示 X 轴和 Y 轴数据
+                      hoverinfo="x+y", 
                       textfont_size=12)  
 
-    # 图表美化
     fig.update_layout(
-        plot_bgcolor="white",  # 设为白色背景
-        bargap=0.1,  # 调整柱子间隔
+        plot_bgcolor="white",  
+        bargap=0.1, 
         title=dict(text="Billionaire Age Distribution", font=dict(size=20, family="Arial", color="black"), x=0.5),
         xaxis=dict(title="Age", tickangle=0, gridcolor="lightgrey"),
         yaxis=dict(title="Number of Billionaires", gridcolor="lightgrey"),
@@ -230,25 +239,23 @@ def create_age_distribution():
 
 def create_gender_pie():
     """
-    生成亿万富翁的性别比例饼图
+    Generate a pie chart of the gender ratio of billionaires
     """
-    # 计算性别比例
+    # calculate gender ratio
     gender_counts = df['gender'].value_counts().reset_index()
     gender_counts.columns = ['Gender', 'Count']
 
-    # 颜色映射
-    color_map = {"M": "#1f77b4", "F": "#e377c2"}  # 男性-蓝色，女性-粉色
+    color_map = {"M": "#1f77b4", "F": "#e377c2"}  # male-blue，female-pink
 
-    # 生成饼图
+    # create pie chart
     fig = px.pie(gender_counts, 
                  names="Gender", 
                  values="Count",
                  title="Gender Distribution of Billionaires",
                  color="Gender",
                  color_discrete_map=color_map,
-                 hole=0.4)  # 设定圆环
+                 hole=0.4)  
 
-    # 增强 Tooltip（显示性别、人数、百分比）
     fig.update_traces(
         textinfo="percent+label",
         hoverinfo="label+value+percent",
@@ -256,7 +263,7 @@ def create_gender_pie():
     )
 
 
-    # 调整布局
+    # adjust layout
     fig.update_layout(
         annotations=[
             dict(text="<b>Gender</b>", x=0.5, y=0.5, showarrow=False, font=dict(size=18))
@@ -267,7 +274,7 @@ def create_gender_pie():
 
 def create_wealth_source_pie():
     """
-    生成财富来源（创业/继承）饼图
+    Generate a pie chart of sources of wealth (entrepreneurship/inheritance).
     """
     source_counts = df["selfMade"].value_counts().reset_index()
     source_counts.columns = ["Wealth Source", "Count"]
